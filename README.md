@@ -98,3 +98,12 @@ Oleh karena itu, Rust memberlakukan aturan ketat:
 Di sinilah `lazy_static` berperan: *library* ini memungkinkan inisialisasi struktur data dinamis saat *runtime* (ketika pertama kali diakses) sekaligus membungkusnya dalam lapisan keamanan (*thread-safe*) tanpa mengharuskan kita menulis blok kode `unsafe`.
 
 #### Reflection Subscriber-2
+
+##### 2. Observer Pattern dan Multiple Instances
+* **Menambah banyak *Subscriber* (Receiver):** Observer Pattern membuat penambahan *subscriber* baru menjadi sangat mudah (*loosely coupled*). Aplikasi *Publisher* (Main app) tidak perlu diubah kodenya sama sekali. *Subscriber* cukup memanggil *endpoint* `/subscribe`, dan *Publisher* hanya perlu menambahkan URL baru tersebut ke dalam daftarnya (DashMap) untuk dikirimi notifikasi nantinya.
+* **Menambah banyak *Publisher* (Main app):** Jika kita menjalankan lebih dari satu *instance* Main app, ini akan menjadi **masalah baru**. Karena daftar *subscriber* (DashMap) saat ini disimpan di **memori lokal (RAM)** masing-masing *instance*, *Publisher* A tidak akan tahu siapa saja yang sudah *subscribe* lewat *Publisher* B. Agar sistem ini tetap berjalan baik dengan banyak Main app, kita harus memindahkan penyimpanan daftar *subscriber* ke *database* terpusat (seperti PostgreSQL atau Redis) yang bisa diakses oleh semua *instance* Main app.
+
+##### 3. Eksplorasi Pengujian (Tests) dan Dokumentasi Postman
+Ya, saya mencoba mengeksplorasi fitur *Tests* dan *Documentation* di Postman. Fitur ini **sangat berguna**, terutama untuk kerja tim (*Group Project*). 
+- Fitur **Tests** memungkinkan kita menulis *script* validasi otomatis (misal: memastikan *status code* 200 OK atau mengecek format JSON). Ini sangat menghemat waktu karena kita tidak perlu mengecek respons secara manual.
+- Fitur **Documentation** membantu memperjelas kegunaan setiap API, parameter apa yang dibutuhkan, dan contoh *payload*-nya, sehingga rekan satu tim (khususnya *Frontend developer*) bisa langsung paham cara integrasinya tanpa harus terus-menerus bertanya.
