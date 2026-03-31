@@ -86,4 +86,15 @@ This is the place for you to write reflections:
 
 #### Reflection Subscriber-1
 
+##### 1. Mengapa menggunakan `RwLock<>` alih-alih `Mutex<>`?
+`RwLock` (Read-Write Lock) sangat cocok digunakan dalam kasus ini karena memungkinkan **banyak *thread* membaca data secara bersamaan** (*multiple readers*), selama tidak ada *thread* yang sedang menulis. Kuncian (*lock*) eksklusif hanya terjadi saat ada *thread* yang ingin menambah notifikasi (*write*). 
+Sebaliknya, `Mutex` (Mutual Exclusion) mengunci akses secara absolut hanya untuk **satu *thread* saja** pada satu waktu, baik untuk membaca maupun menulis. Karena notifikasi lebih sering dibaca (`list_all_as_string`) daripada ditambah (`add`), menggunakan `RwLock` jauh lebih efisien dan mencegah *bottleneck* (antrean panjang) saat aplikasi sedang ramai membaca data.
+
+##### 2. Mengapa Rust tidak mengizinkan mutasi variabel `static` sebebas Java dan butuh `lazy_static`?
+Di Java, memodifikasi variabel `static` sangat mudah, tetapi hal itu sangat rentan terhadap **data races** jika diakses oleh banyak *thread* sekaligus. Rust dibangun dengan prinsip utama jaminan *memory safety* dan *thread safety*.
+Oleh karena itu, Rust memberlakukan aturan ketat:
+- Variabel `static` bawaan harus berukuran tetap dan nilainya bisa dikalkulasi saat kompilasi (*compile-time*). Struktur data dinamis seperti `Vec` atau `DashMap` dialokasikan di *heap* saat aplikasi berjalan (*runtime*), sehingga tidak bisa langsung dijadikan variabel `static` biasa.
+- Mengubah variabel global (menggunakan `static mut`) dianggap **tidak aman (unsafe)** di Rust karena berpotensi merusak memori jika diakses bersamaan.
+Di sinilah `lazy_static` berperan: *library* ini memungkinkan inisialisasi struktur data dinamis saat *runtime* (ketika pertama kali diakses) sekaligus membungkusnya dalam lapisan keamanan (*thread-safe*) tanpa mengharuskan kita menulis blok kode `unsafe`.
+
 #### Reflection Subscriber-2
